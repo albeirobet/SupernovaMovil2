@@ -31,6 +31,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import runcode.co.supernovamovil.dm.Persona;
+
 /**
  * Provides UI for the view with List.
  */
@@ -39,6 +44,8 @@ public class ListContentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         RecyclerView recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
         ContentAdapter adapter = new ContentAdapter(recyclerView.getContext());
@@ -52,6 +59,7 @@ public class ListContentFragment extends Fragment {
         public ImageView avator;
         public TextView name;
         public TextView description;
+        public TextView description2;
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
 
 
@@ -60,6 +68,7 @@ public class ListContentFragment extends Fragment {
             avator = (ImageView) itemView.findViewById(R.id.list_avatar);
             name = (TextView) itemView.findViewById(R.id.list_title);
             description = (TextView) itemView.findViewById(R.id.list_desc);
+            description2 = (TextView) itemView.findViewById(R.id.list_desc2);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -84,8 +93,12 @@ public class ListContentFragment extends Fragment {
         private final String[] mPlaceDesc;
         private final Drawable[] mPlaceAvators;
 
+        private List<Persona> listPersonas = new ArrayList<>();
+
+
         public ContentAdapter(Context context) {
             Resources resources = context.getResources();
+            cargarDatosEjemplo();
             mPlaces = resources.getStringArray(R.array.places);
             mPlaceDesc = resources.getStringArray(R.array.place_desc);
             TypedArray a = resources.obtainTypedArray(R.array.place_avator);
@@ -95,6 +108,18 @@ public class ListContentFragment extends Fragment {
             }
             a.recycle();
         }
+
+        public void cargarDatosEjemplo(){
+
+            for (int i=0;i<LENGTH;i++){
+                Persona persona = new Persona();
+                persona.setCedula("PA-"+(int) (Math.random()*35000+1));
+                persona.setNombre("Eyder Ascuntar "+(int) (Math.random()*35000+1));
+                listPersonas.add(persona);
+            }
+
+        }
+
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
@@ -102,9 +127,10 @@ public class ListContentFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.avator.setImageDrawable(mPlaceAvators[position % mPlaceAvators.length]);
-            holder.name.setText(mPlaces[position % mPlaces.length]);
-            holder.description.setText(mPlaceDesc[position % mPlaceDesc.length]);
+            holder.avator.setImageDrawable(mPlaceAvators[5]);
+            holder.name.setText(""+position+"   "+listPersonas.get(position).getCedula());
+            holder.description.setText(""+position+"   "+listPersonas.get(position).getNombre());
+            holder.description2.setText(""+position+"   "+listPersonas.get(position).getNombre());
         }
 
         @Override
