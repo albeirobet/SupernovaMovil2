@@ -25,11 +25,13 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+import runcode.co.supernovamovil.fragment.ListLecturasFragment;
+
 
 /**
  * Provides UI for the main screen.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     private DrawerLayout mDrawerLayout;
 
@@ -96,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
     // Add Fragments to Tabs
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
-        adapter.addFragment(new ListContentFragment(), "Pendientes");
+        adapter.addFragment(new ListLecturasFragment(), "Pendientes");
+        adapter.addFragment(new ListContentFragment(), "Original");
         //adapter.addFragment(new TileContentFragment(), "Procesadas");
         //adapter.addFragment(new CardContentFragment(), "Evidencias");
         viewPager.setAdapter(adapter);

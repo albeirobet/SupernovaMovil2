@@ -32,7 +32,7 @@ public class AlbeiroActivity extends AppCompatActivity implements AdapterAlbeiro
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rvList);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new AdapterAlbeiro(this);
+        mAdapter = new AdapterAlbeiro(this,getBaseContext());
         mAdapter.setLinearLayoutManager(mLayoutManager);
         mAdapter.setRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);

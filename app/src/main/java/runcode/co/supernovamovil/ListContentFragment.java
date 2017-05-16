@@ -60,11 +60,10 @@ public class ListContentFragment extends Fragment {
         public TextView name;
         public TextView description;
         public TextView description2;
+
+
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
-
-
             super(inflater.inflate(R.layout.item_list, parent, false));
-
             avator = (ImageView) itemView.findViewById(R.id.list_avatar);
             name = (TextView) itemView.findViewById(R.id.list_title);
             description = (TextView) itemView.findViewById(R.id.list_desc);

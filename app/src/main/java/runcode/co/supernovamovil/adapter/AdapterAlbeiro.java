@@ -1,16 +1,25 @@
 package runcode.co.supernovamovil.adapter;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import org.apache.http.conn.ConnectTimeoutException;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import runcode.co.supernovamovil.DetailActivity;
 import runcode.co.supernovamovil.R;
 import runcode.co.supernovamovil.dm.Persona;
 
@@ -20,7 +29,7 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final int VIEW_PROG = 0;
 
     private ArrayList<Persona> itemList;
-
+    private Context context;
     private OnLoadMoreListener onLoadMoreListener;
     private LinearLayoutManager mLinearLayoutManager;
 
@@ -32,7 +41,8 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void onLoadMore();
     }
 
-    public AdapterAlbeiro(OnLoadMoreListener onLoadMoreListener) {
+    public AdapterAlbeiro(OnLoadMoreListener onLoadMoreListener, Context context) {
+        this.context=context;
         this.onLoadMoreListener=onLoadMoreListener;
         itemList =new ArrayList<>();
     }
@@ -67,7 +77,7 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int viewType) {
         if (viewType == VIEW_ITEM) {
-            return new StudentViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_text, parent, false));
+            return new StudentViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list, parent, false));
         } else {
             return new ProgressViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_progress, parent, false));
         }
@@ -89,7 +99,12 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof StudentViewHolder) {
             Persona singleItem = (Persona) itemList.get(position);
-            ((StudentViewHolder) holder).tvItem.setText(singleItem.getNombre());
+
+            Drawable drawableIcono = this.context.getResources().getDrawable(R.drawable.a_avator);
+            ((StudentViewHolder) holder).list_avatar.setImageDrawable(drawableIcono);
+            ((StudentViewHolder) holder).list_title.setText(singleItem.getNombre());
+            ((StudentViewHolder) holder).list_desc.setText("Solo una pruba 1");
+            ((StudentViewHolder) holder).list_desc2.setText("Solo una pruba");
         }
     }
 
@@ -118,11 +133,27 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     static class StudentViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvItem;
+        public TextView list_title;
+        public TextView list_desc;
+        public TextView list_desc2;
+        public ImageView list_avatar;
 
         public StudentViewHolder(View v) {
             super(v);
-            tvItem = (TextView) v.findViewById(R.id.tvItem);
+            list_title = (TextView) v.findViewById(R.id.list_title);
+            list_desc  = (TextView) v.findViewById(R.id.list_desc);
+            list_desc2  = (TextView) v.findViewById(R.id.list_desc2);
+            list_avatar = (ImageView) v.findViewById(R.id.list_avatar);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("Click en el Objeto","Será¡? "+getAdapterPosition());
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, DetailActivity.class);
+                    intent.putExtra(DetailActivity.EXTRA_POSITION, getAdapterPosition());
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 
