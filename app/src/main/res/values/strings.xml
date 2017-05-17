@@ -21,5 +21,6 @@
     <string name="sincronizacion_datos">Sincronización</string>
     <string name="acerca">ACERCA DE </string>
     <string name="opciones">OPCIONES</string>
+    <string name="action_search">Buscar</string>
 
 </resources>

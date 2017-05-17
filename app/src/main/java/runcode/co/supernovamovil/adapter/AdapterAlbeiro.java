@@ -103,8 +103,8 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
             Drawable drawableIcono = this.context.getResources().getDrawable(R.drawable.a_avator);
             ((StudentViewHolder) holder).list_avatar.setImageDrawable(drawableIcono);
             ((StudentViewHolder) holder).list_title.setText(singleItem.getNombre());
-            ((StudentViewHolder) holder).list_desc.setText("Solo una pruba 1");
-            ((StudentViewHolder) holder).list_desc2.setText("Solo una pruba");
+            ((StudentViewHolder) holder).list_desc.setText(singleItem.getCedula());
+            ((StudentViewHolder) holder).list_desc2.setText("Dirección");
         }
     }
 
@@ -164,5 +164,13 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
             pBar = (ProgressBar) v.findViewById(R.id.pBar);
         }
     }
+
+
+    public void setFilter(List<Persona> countryModels){
+        itemList = new ArrayList<>();
+        itemList.addAll(countryModels);
+        notifyDataSetChanged();
+    }
+
 
 }

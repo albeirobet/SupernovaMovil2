@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity  {
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         adapter.addFragment(new ListLecturasFragment(), "Pendientes");
-        adapter.addFragment(new ListContentFragment(), "Original");
+        //adapter.addFragment(new ListContentFragment(), "Original");
         //adapter.addFragment(new TileContentFragment(), "Procesadas");
         //adapter.addFragment(new CardContentFragment(), "Evidencias");
         viewPager.setAdapter(adapter);
@@ -134,12 +134,6 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -148,9 +142,12 @@ public class MainActivity extends AppCompatActivity  {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == android.R.id.home) {
+
+        //if (id == R.id.action_settings) {
+        //    return true;
+        //} else
+
+        if (id == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
         return super.onOptionsItemSelected(item);
