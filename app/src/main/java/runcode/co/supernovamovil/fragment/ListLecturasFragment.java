@@ -48,7 +48,10 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
     private SwipeRefreshLayout swipeRefresh;
     private ViewGroup container;
 
+    //Bandera para identificar si aún hay registros para carga
     private boolean registrosDisponiblesCarga = false;
+    //Bandera para identificar si es el final de la carga de registros
+    private boolean finalRegistrosCarga=false;
     private CargaPruebaPersonas cargaPruebaPersonas = new CargaPruebaPersonas();
 
     @Override
@@ -75,7 +78,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
             @Override
             public void onLoadMore() {
                 Log.d("ListLecturasFragment", "onLoadMore");
-                if (registrosDisponiblesCarga) {
+                if (registrosDisponiblesCarga&&finalRegistrosCarga==false) {
                     mAdapter.setProgressMore(true);
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -93,6 +96,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                             }else{
                                 Log.d("Es el fin", ""+end);
                                 end=itemListOriginal.size();
+                                finalRegistrosCarga=true;
                             }
                             itemList = new ArrayList<>(itemListOriginal.subList(start, end));
                             mAdapter.addItemMore(itemList);
@@ -100,6 +104,9 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
 
                         }
                     }, 2000);
+                }else{
+                    Log.d("finalRegistrosCarga", ""+finalRegistrosCarga);
+                    Log.d("registrosDisponibles", ""+registrosDisponiblesCarga);
                 }
             }
         };
@@ -110,38 +117,30 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         SwipeRefreshLayout.OnRefreshListener listener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.d("MainActivity_", "onRefresh");
+                Log.d("Refrescando", "onRefresh");
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeRefresh.setRefreshing(false);
-                        loadData();
+                        loadData("On Refresh");
+                        finalRegistrosCarga=false;
 
                     }
                 }, 2000);
             }
         };
         swipeRefresh.setOnRefreshListener(listener);
-        loadData();
+        loadData("Original");
         setHasOptionsMenu(true);
         return swipeRefreshLayout;
 
     }
 
 
-    private void loadData() {
-        // itemList.clear();
-
-        /**
-         if(itemListOriginal.size()>0&&itemListOriginal.size()>9) {
-         itemList = new ArrayList<>(itemListOriginal.subList(0, 9));
-         }else if(){
-         itemList.clear();
-         Snackbar.make(container, "No hay Registros!", Snackbar.LENGTH_LONG).show();
-         }*/
+    private void loadData(String origen) {
+        Log.d("loadData", origen);
 
         int contadorRegistrosCargar = 10;
-
         if (itemListOriginal.size() > 0) {
             if (itemListOriginal.size() > contadorRegistrosCargar) {
                 itemList = new ArrayList<>(itemListOriginal.subList(0, contadorRegistrosCargar));
@@ -157,6 +156,10 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         }
         mAdapter.addAll(itemList);
     }
+//2285000
+//3.800.000
+//humberto.sandoval@openenglish.com
+//Carlos Andres Leon
 
 
     @Override
@@ -188,7 +191,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
     @Override
     public boolean onQueryTextChange(String newText) {
         Log.d("onQueryTextChange", newText);
-        final List<Persona> filteredModelList = filter(itemList, newText);
+        final List<Persona> filteredModelList = filter(itemListOriginal, newText);
         if (filteredModelList.size() > 0) {
             mAdapter.setFilter(filteredModelList);
             return true;
@@ -208,8 +211,6 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
 
     private List<Persona> filter(List<Persona> models, String query) {
         query = query.toLowerCase();
-
-
         Log.d("Tamaño Original Lista: ", "" + models.size());
         final List<Persona> filteredModelList = new ArrayList<>();
         for (Persona model : models) {
@@ -221,6 +222,5 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         Log.d("Tamaño Filtrada:  ", "" + filteredModelList.size());
         return filteredModelList;
     }
-
 
 }

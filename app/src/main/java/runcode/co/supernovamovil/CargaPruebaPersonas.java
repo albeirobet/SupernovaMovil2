@@ -101,8 +101,8 @@ public class CargaPruebaPersonas {
         persona17.setCedula("17");
         listPersonas.add(persona17);
         Persona persona18= new Persona();
-        persona8.setNombre("Eyder Gonzales");
-        persona8.setCedula("18");
+        persona18.setNombre("Eyder Gonzales");
+        persona18.setCedula("18");
         listPersonas.add(persona18);
         Persona persona19= new Persona();
         persona19.setNombre("Eyder Cerón");
@@ -140,6 +140,11 @@ public class CargaPruebaPersonas {
         persona27.setNombre("Javier Ortiz");
         persona27.setCedula("27");
         listPersonas.add(persona27);
+
+        Persona persona28= new Persona();
+        persona28.setNombre("Eyder Giraldo");
+        persona28.setCedula("28");
+        listPersonas.add(persona28);
 
 
 
