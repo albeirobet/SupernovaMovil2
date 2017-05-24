@@ -101,16 +101,22 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                 Log.d("ListLecturasFragment", "onLoadMore");
                 //Se verifica si hay aun mas registros disponibles para la carga en el recyclerview y si hemos llegado al final de la lista
                 if (registrosDisponiblesCarga&&finalRegistrosCarga==false) {
+                    //Activo la barra de progreso
                     mAdapter.setProgressMore(true);
+
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            //Limpio la lista de visualización en pantalla
                             itemList.clear();
+                            //Desactivo barra de progreso
                             mAdapter.setProgressMore(false);
+                            //Verifico el item de inicio cargado en el adapter
                             int start = mAdapter.getItemCount();
                             Log.d("El registro de Inicio", ""+start);
+                            //Defino el registro de Fin
                             int end = start + 10;
-
+                            //Verifico si está activa la ventana de busqueda
                             if(!activoBusqueda){
                                 if(end<itemListOriginal.size()){
                                     Log.d("Normal", ""+end);
@@ -143,10 +149,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                 }
             }
         };
-        mAdapter = new AdapterAlbeiro(onLoadMoreListener, swipeRefreshLayout.getContext());
-        mAdapter.setLinearLayoutManager(mLayoutManager);
-        mAdapter.setRecyclerView(mRecyclerView);
-        mRecyclerView.setAdapter(mAdapter);
+
         listener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -162,7 +165,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                 }, 2000);
             }
         };
-        swipeRefresh.setOnRefreshListener(listener);
+
         loadData("Original");
         //Para que el menu aparezca en los fragments :D
         setHasOptionsMenu(true);
@@ -172,6 +175,12 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
 
 
     private void loadData(String origen) {
+
+        mAdapter = new AdapterAlbeiro(onLoadMoreListener, swipeRefreshLayout.getContext());
+        mAdapter.setLinearLayoutManager(mLayoutManager);
+        mAdapter.setRecyclerView(mRecyclerView);
+        mRecyclerView.setAdapter(mAdapter);
+        swipeRefresh.setOnRefreshListener(listener);
         Log.d("loadData", origen);
 
         int contadorRegistrosCargar = 10;
@@ -193,6 +202,9 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         }
         mAdapter.addAll(itemList);
     }
+
+
+
 //2285000
 //3.800.000
 //humberto.sandoval@openenglish.com
