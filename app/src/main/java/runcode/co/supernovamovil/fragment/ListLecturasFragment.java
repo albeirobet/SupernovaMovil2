@@ -39,11 +39,12 @@ import runcode.co.supernovamovil.dm.Persona;
  * Created by root on 10/05/17.
  */
 
-public class ListLecturasFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class ListLecturasFragment extends Fragment implements SearchView.OnQueryTextListener{
 
     private DrawerLayout mDrawerLayout;
     private AdapterAlbeiro mAdapter;
     private List<Persona> itemListOriginal;
+    private List<Persona> itemListFiltrada;
     private List<Persona> itemList;
     private SwipeRefreshLayout swipeRefresh;
     private ViewGroup container;
@@ -53,6 +54,15 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
     //Bandera para identificar si es el final de la carga de registros
     private boolean finalRegistrosCarga=false;
     private CargaPruebaPersonas cargaPruebaPersonas = new CargaPruebaPersonas();
+    private boolean activoBusqueda =false;
+    private RecyclerView mRecyclerView;
+
+    private MenuItem item;
+    private SearchView searchView;
+    private LinearLayoutManager mLayoutManager;
+    private AdapterAlbeiro.OnLoadMoreListener onLoadMoreListener;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout.OnRefreshListener listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,44 +73,67 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         this.container = container;
 
 
-        SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(
+        swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(
                 R.layout.swipe_albeiro, container, false);
 
-
+        //Lista que se muestra en pantalla
         itemList = new ArrayList<Persona>();
+        //Lista con todos los elementos desde la bd
         itemListOriginal = cargaPruebaPersonas.getListPersonas();
+        //Lista filtrada según busqueda del usuario
+        itemListFiltrada = new ArrayList<Persona>();
+
+
+        //Se obtiene el SwipeRefresh
         swipeRefresh = (SwipeRefreshLayout) swipeRefreshLayout.findViewById(R.id.swipeAlbeiro);
-        RecyclerView mRecyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.rvList);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(swipeRefreshLayout.getContext());
+        //Se obtiene el RecyclerView
+        mRecyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.rvList);
+        //Se asocia el Swipe a una LayoutManager
+        mLayoutManager = new LinearLayoutManager(swipeRefreshLayout.getContext());
+        //Se asocia el LayoutManager al RecyclerView
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        AdapterAlbeiro.OnLoadMoreListener onLoadMoreListener = new AdapterAlbeiro.OnLoadMoreListener() {
+
+        //Se crea un listener para cargar mas objetos al RecyclerView
+        onLoadMoreListener = new AdapterAlbeiro.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
                 Log.d("ListLecturasFragment", "onLoadMore");
+                //Se verifica si hay aun mas registros disponibles para la carga en el recyclerview y si hemos llegado al final de la lista
                 if (registrosDisponiblesCarga&&finalRegistrosCarga==false) {
                     mAdapter.setProgressMore(true);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-
                             itemList.clear();
                             mAdapter.setProgressMore(false);
                             int start = mAdapter.getItemCount();
                             Log.d("El registro de Inicio", ""+start);
                             int end = start + 10;
 
-
-                            if(end<itemListOriginal.size()){
-                                Log.d("Normal", ""+end);
+                            if(!activoBusqueda){
+                                if(end<itemListOriginal.size()){
+                                    Log.d("Normal", ""+end);
+                                }else{
+                                    Log.d("Es el fin", ""+end);
+                                    end=itemListOriginal.size();
+                                    finalRegistrosCarga=true;
+                                }
+                                itemList = new ArrayList<>(itemListOriginal.subList(start, end));
+                                mAdapter.addItemMore(itemList);
+                                mAdapter.setMoreLoading(false);
                             }else{
-                                Log.d("Es el fin", ""+end);
-                                end=itemListOriginal.size();
-                                finalRegistrosCarga=true;
+                                if(end<itemListFiltrada.size()){
+                                    Log.d("Normal Filtrada", ""+end);
+                                }else{
+                                    Log.d("Es el fin Filtrada", ""+end);
+                                    end=itemListFiltrada.size();
+                                    finalRegistrosCarga=true;
+                                }
+                                itemList = new ArrayList<>(itemListFiltrada.subList(start, end));
+                                mAdapter.addItemMore(itemList);
+                                mAdapter.setMoreLoading(false);
                             }
-                            itemList = new ArrayList<>(itemListOriginal.subList(start, end));
-                            mAdapter.addItemMore(itemList);
-                            mAdapter.setMoreLoading(false);
 
                         }
                     }, 2000);
@@ -114,7 +147,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         mAdapter.setLinearLayoutManager(mLayoutManager);
         mAdapter.setRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
-        SwipeRefreshLayout.OnRefreshListener listener = new SwipeRefreshLayout.OnRefreshListener() {
+        listener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 Log.d("Refrescando", "onRefresh");
@@ -131,6 +164,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         };
         swipeRefresh.setOnRefreshListener(listener);
         loadData("Original");
+        //Para que el menu aparezca en los fragments :D
         setHasOptionsMenu(true);
         return swipeRefreshLayout;
 
@@ -145,13 +179,16 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
             if (itemListOriginal.size() > contadorRegistrosCargar) {
                 itemList = new ArrayList<>(itemListOriginal.subList(0, contadorRegistrosCargar));
                 registrosDisponiblesCarga = true;
+                finalRegistrosCarga=false;
             } else {
                 registrosDisponiblesCarga = false;
+                finalRegistrosCarga=true;
                 itemList = new ArrayList<>(itemListOriginal);
             }
         } else {
             itemList.clear();
             registrosDisponiblesCarga = false;
+            finalRegistrosCarga=true;
             Snackbar.make(container, "No hay Registros!", Snackbar.LENGTH_LONG).show();
         }
         mAdapter.addAll(itemList);
@@ -166,37 +203,71 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
 
-        final MenuItem item = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(this);
+
 
         MenuItemCompat.setOnActionExpandListener(item,
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
-                        // Do something when collapsed
+                        // Se llama cuando se cierrar la busqueda
+                        // mAdapter.setFilter(itemList);
+                        activoBusqueda =false;
+
+                        //loadData("Cerrando Busqueda");
+                        mAdapter.setLinearLayoutManager(mLayoutManager);
                         mAdapter.setFilter(itemList);
+                        Snackbar.make(container, "onMenutItemActionCollapse Called!", Snackbar.LENGTH_LONG).show();
+
+
+                        //Intentando arreglar el tema del load More
+
                         return true; // Return true to collapse action view
                     }
 
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
-                        // Do something when expanded
+                        // Se llama cuando se despliega el menu de busqueda
+                        activoBusqueda =true;
+                        mAdapter.setLinearLayoutManager(mLayoutManager);
+                        mAdapter.setFilter(itemList);
+                        Snackbar.make(container, "onMenuItemActionExpand Called!", Snackbar.LENGTH_LONG).show();
                         return true; // Return true to expand action view
                     }
                 });
     }
 
 
+
+
+
+
+
+
     @Override
     public boolean onQueryTextChange(String newText) {
         Log.d("onQueryTextChange", newText);
-        final List<Persona> filteredModelList = filter(itemListOriginal, newText);
-        if (filteredModelList.size() > 0) {
-            mAdapter.setFilter(filteredModelList);
+        itemListFiltrada = new ArrayList<Persona>();
+        itemListFiltrada = filter(itemListOriginal, newText);
+        int contadorRegistrosCargar = 10;
+        if (itemListFiltrada.size() > 0) {
+            if (itemListFiltrada.size() > contadorRegistrosCargar) {
+                itemList = new ArrayList<>(itemListFiltrada.subList(0, contadorRegistrosCargar));
+                registrosDisponiblesCarga = true;
+                finalRegistrosCarga=false;
+            } else {
+                registrosDisponiblesCarga = false;
+                finalRegistrosCarga=true;
+                itemList = new ArrayList<>(itemListFiltrada);
+            }
+            mAdapter.setFilter(itemList);
             return true;
         } else {
             Snackbar.make(container, "No hay Registros!", Snackbar.LENGTH_LONG).show();
+            registrosDisponiblesCarga = false;
+            finalRegistrosCarga=true;
             mAdapter.setFilter(new ArrayList<Persona>());
             return false;
         }
@@ -207,6 +278,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         Log.d("onQueryTextSubmit", query);
         return false;
     }
+
 
 
     private List<Persona> filter(List<Persona> models, String query) {

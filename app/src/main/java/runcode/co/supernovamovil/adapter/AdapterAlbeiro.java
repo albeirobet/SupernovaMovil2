@@ -52,13 +52,21 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void setRecyclerView(RecyclerView mView){
+
+
         mView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+
+
+
                 visibleItemCount = recyclerView.getChildCount();
+                Log.d("visibleItemCount", ""+visibleItemCount);
                 totalItemCount = mLinearLayoutManager.getItemCount();
+                Log.d("totalItemCount", ""+totalItemCount);
                 firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+                Log.d("firstVisibleItem", ""+firstVisibleItem);
                 if (!isMoreLoading && (totalItemCount - visibleItemCount)<= (firstVisibleItem + visibleThreshold)) {
                     if (onLoadMoreListener != null) {
                         onLoadMoreListener.onLoadMore();
@@ -167,7 +175,7 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
 
     public void setFilter(List<Persona> countryModels){
-        itemList = new ArrayList<>();
+        itemList.clear();
         itemList.addAll(countryModels);
         notifyDataSetChanged();
     }
