@@ -63,6 +63,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
     private AdapterAlbeiro.OnLoadMoreListener onLoadMoreListener;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SwipeRefreshLayout.OnRefreshListener listener;
+    private String textoBuscar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,6 +93,8 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         mLayoutManager = new LinearLayoutManager(swipeRefreshLayout.getContext());
         //Se asocia el LayoutManager al RecyclerView
         mRecyclerView.setLayoutManager(mLayoutManager);
+        //Inicializo el texto a buscar
+        textoBuscar="";
 
 
         //Se crea un listener para cargar mas objetos al RecyclerView
@@ -102,7 +105,9 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                 //Se verifica si hay aun mas registros disponibles para la carga en el recyclerview y si hemos llegado al final de la lista
                 if (registrosDisponiblesCarga&&finalRegistrosCarga==false) {
                     //Activo la barra de progreso
-                    mAdapter.setProgressMore(true);
+
+                    if(!mAdapter.isProgress())
+                        mAdapter.setProgressMore(true);
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -147,6 +152,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                     Log.d("finalRegistrosCarga", ""+finalRegistrosCarga);
                     Log.d("registrosDisponibles", ""+registrosDisponiblesCarga);
                 }
+
             }
         };
 
@@ -158,7 +164,11 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                     @Override
                     public void run() {
                         swipeRefresh.setRefreshing(false);
-                        loadData("On Refresh");
+                        if(!activoBusqueda) {
+                            loadData("On Refresh");
+                        }else{
+                            realizarBusquedaRegistros(textoBuscar);
+                        }
                         finalRegistrosCarga=false;
 
                     }
@@ -181,6 +191,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
         mAdapter.setRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
         swipeRefresh.setOnRefreshListener(listener);
+
         Log.d("loadData", origen);
 
         int contadorRegistrosCargar = 10;
@@ -196,7 +207,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
             }
         } else {
             itemList.clear();
-            registrosDisponiblesCarga = false;
+           // registrosDisponiblesCarga = false;
             finalRegistrosCarga=true;
             Snackbar.make(container, "No hay Registros!", Snackbar.LENGTH_LONG).show();
         }
@@ -224,18 +235,9 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                 new MenuItemCompat.OnActionExpandListener() {
                     @Override
                     public boolean onMenuItemActionCollapse(MenuItem item) {
-                        // Se llama cuando se cierrar la busqueda
-                        // mAdapter.setFilter(itemList);
                         activoBusqueda =false;
-
-                        //loadData("Cerrando Busqueda");
-                        mAdapter.setLinearLayoutManager(mLayoutManager);
-                        mAdapter.setFilter(itemList);
-                        Snackbar.make(container, "onMenutItemActionCollapse Called!", Snackbar.LENGTH_LONG).show();
-
-
-                        //Intentando arreglar el tema del load More
-
+                        loadData("Cerrando Busqueda");
+                        //Snackbar.make(container, "onMenutItemActionCollapse Called!", Snackbar.LENGTH_LONG).show();
                         return true; // Return true to collapse action view
                     }
 
@@ -243,9 +245,7 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                     public boolean onMenuItemActionExpand(MenuItem item) {
                         // Se llama cuando se despliega el menu de busqueda
                         activoBusqueda =true;
-                        mAdapter.setLinearLayoutManager(mLayoutManager);
-                        mAdapter.setFilter(itemList);
-                        Snackbar.make(container, "onMenuItemActionExpand Called!", Snackbar.LENGTH_LONG).show();
+                        //Snackbar.make(container, "onMenuItemActionExpand Called!", Snackbar.LENGTH_LONG).show();
                         return true; // Return true to expand action view
                     }
                 });
@@ -261,10 +261,30 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
     @Override
     public boolean onQueryTextChange(String newText) {
         Log.d("onQueryTextChange", newText);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String newText) {
+        Log.d("onQueryTextSubmit", newText);
+        this.textoBuscar=newText;
+        return realizarBusquedaRegistros(textoBuscar);
+    }
+
+    //109.900
+    public boolean realizarBusquedaRegistros(String newText){
+
         itemListFiltrada = new ArrayList<Persona>();
         itemListFiltrada = filter(itemListOriginal, newText);
         int contadorRegistrosCargar = 10;
         if (itemListFiltrada.size() > 0) {
+
+            mAdapter = new AdapterAlbeiro(onLoadMoreListener, swipeRefreshLayout.getContext());
+            mAdapter.setLinearLayoutManager(mLayoutManager);
+            mAdapter.setRecyclerView(mRecyclerView);
+            mRecyclerView.setAdapter(mAdapter);
+            swipeRefresh.setOnRefreshListener(listener);
+
             if (itemListFiltrada.size() > contadorRegistrosCargar) {
                 itemList = new ArrayList<>(itemListFiltrada.subList(0, contadorRegistrosCargar));
                 registrosDisponiblesCarga = true;
@@ -280,17 +300,12 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
             Snackbar.make(container, "No hay Registros!", Snackbar.LENGTH_LONG).show();
             registrosDisponiblesCarga = false;
             finalRegistrosCarga=true;
-            mAdapter.setFilter(new ArrayList<Persona>());
+            itemList.clear();
+            mAdapter.setFilter(itemList);
+
             return false;
         }
     }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        Log.d("onQueryTextSubmit", query);
-        return false;
-    }
-
 
 
     private List<Persona> filter(List<Persona> models, String query) {

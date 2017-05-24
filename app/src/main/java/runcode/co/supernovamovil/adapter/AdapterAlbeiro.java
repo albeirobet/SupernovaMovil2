@@ -36,6 +36,7 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private boolean isMoreLoading = false;
     private int visibleThreshold = 1;
     int firstVisibleItem, visibleItemCount, totalItemCount;
+    private boolean isProgress;
 
     public interface OnLoadMoreListener{
         void onLoadMore();
@@ -126,6 +127,7 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void setProgressMore(final boolean isProgress) {
+        this.isProgress=isProgress;
         if (isProgress) {
             new Handler().post(new Runnable() {
                 @Override
@@ -181,4 +183,11 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
 
+    public boolean isProgress() {
+        return isProgress;
+    }
+
+    public void setProgress(boolean progress) {
+        isProgress = progress;
+    }
 }
