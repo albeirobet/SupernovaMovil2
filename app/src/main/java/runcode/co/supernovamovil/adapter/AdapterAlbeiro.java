@@ -3,6 +3,7 @@ package runcode.co.supernovamovil.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,8 +20,11 @@ import org.apache.http.conn.ConnectTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import runcode.co.supernovamovil.DetailActivity;
+import runcode.co.supernovamovil.LecturasActivity;
 import runcode.co.supernovamovil.R;
+
 import runcode.co.supernovamovil.dm.Persona;
 
 public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -157,10 +161,22 @@ public class AdapterAlbeiro extends RecyclerView.Adapter<RecyclerView.ViewHolder
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     Log.d("Click en el Objeto","Será¡? "+getAdapterPosition());
+                    Log.d("Encontré el ID","Será¡? "+list_title.getText().toString());
+
+
+
                     Context context = v.getContext();
-                    Intent intent = new Intent(context, DetailActivity.class);
-                    intent.putExtra(DetailActivity.EXTRA_POSITION, getAdapterPosition());
+                    Intent intent = new Intent(context, LecturasActivity.class);
+
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("cedula", list_desc.getText().toString());
+                    bundle.putString("nombre", list_title.getText().toString());
+                    bundle.putInt("posicion",getAdapterPosition());
+                    intent.putExtras(bundle);
+
                     context.startActivity(intent);
                 }
             });

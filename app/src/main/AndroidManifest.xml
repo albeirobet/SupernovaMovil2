@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="runcode.co.supernovamovil">
 
+    <!-- To access Google+ APIs: -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,7 +26,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".AlbeiroActivity"></activity>
+        <activity android:name=".AlbeiroActivity" />
+        <activity
+            android:name=".LecturasActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".LecturaActivity"
+            android:label="@string/title_activity_lectura"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -10,5 +10,8 @@
         <!-- Blue -->
 
     </style>
+
     <style name="AppTheme" parent="AppTheme.Base"></style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 </resources>

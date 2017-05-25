@@ -24,10 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import runcode.co.supernovamovil.CargaPruebaPersonas;
 import runcode.co.supernovamovil.DetailActivity;
 import runcode.co.supernovamovil.ListContentFragment;
@@ -237,16 +235,13 @@ public class ListLecturasFragment extends Fragment implements SearchView.OnQuery
                     public boolean onMenuItemActionCollapse(MenuItem item) {
                         activoBusqueda =false;
                         loadData("Cerrando Busqueda");
-                        //Snackbar.make(container, "onMenutItemActionCollapse Called!", Snackbar.LENGTH_LONG).show();
-                        return true; // Return true to collapse action view
+                        return true;
                     }
 
                     @Override
                     public boolean onMenuItemActionExpand(MenuItem item) {
-                        // Se llama cuando se despliega el menu de busqueda
                         activoBusqueda =true;
-                        //Snackbar.make(container, "onMenuItemActionExpand Called!", Snackbar.LENGTH_LONG).show();
-                        return true; // Return true to expand action view
+                        return true;
                     }
                 });
     }
